@@ -17,13 +17,24 @@ export class LessonService {
     return this.lessonRepository.find();
   }
   async createLesson(createLessonInput: createLessonInput): Promise<Lesson> {
-    const { name, startDate, endDate } = createLessonInput;
+    const { name, startDate, endDate, students } = createLessonInput;
     const lesson = this.lessonRepository.create({
       id: uuidv4(),
       name,
       startDate,
       endDate,
+      students,
     });
+    return this.lessonRepository.save(lesson);
+  }
+
+  async assignStudentsToLesson(
+    lessonId: string,
+    studentIds: string[],
+  ): Promise<Lesson> {
+    const lesson = await this.lessonRepository.findOne({ id: lessonId });
+    lesson.students = [...lesson.students, ...studentIds];
+
     return this.lessonRepository.save(lesson);
   }
 }
